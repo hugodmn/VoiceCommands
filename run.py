@@ -123,8 +123,10 @@ def main()->None:
                         STTresult = result["text"]
                         print("transcription : ",STTresult)
                         GOSAIcommands.comparaison(STTresult)
+                        print(GOSAIcommands.modeactive)
                         if GOSAIcommands.modeactive != None :
                             VocalFeedback.speak(GOSAIcommands.modeactive)
+
                 # for i in range(int(1/SLIDING_WINDOW_SECS)*WUWSECONDS+1):
                 #         datarecup = q.get()
                 #         print("recup")

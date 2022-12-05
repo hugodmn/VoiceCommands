@@ -30,7 +30,7 @@ class Commands():
 
                 if (sim2 > 85):
                     print("activation of : ", activ)
-                    self.modeactiv = activ 
+                    self.modeactive = activ 
 
             end = time.time()
             print("process time : ",end - t )
