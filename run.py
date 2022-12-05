@@ -126,6 +126,7 @@ def main()->None:
                         print(GOSAIcommands.modeactive)
                         if GOSAIcommands.modeactive != None :
                             VocalReturn.speak(GOSAIcommands.modeactive)
+                            GOSAIcommands.modeactive = None
 
                 # for i in range(int(1/SLIDING_WINDOW_SECS)*WUWSECONDS+1):
                 #         datarecup = q.get()
