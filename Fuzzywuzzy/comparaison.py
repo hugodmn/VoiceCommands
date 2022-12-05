@@ -5,10 +5,11 @@ import time
 class Commands():
     def __init__(self):
         self.commandsdic = dict()
-        with open("Fuzzywuzzy/command.txt",'r') as f:
+        with open("command.txt",'r') as f:
             lines = f.readlines()
             for line in lines :
                 self.commandsdic[line.split("/")[0]] = line.split("/")[1]
+        self.modeactive = None 
 
     def comparaison(self, transcription : str):
         for command, activ in self.commandsdic.items():
@@ -29,7 +30,7 @@ class Commands():
 
                 if (sim2 > 85):
                     print("activation of : ", activ)
-
+                    self.modeactiv = activ 
 
             end = time.time()
             print("process time : ",end - t )

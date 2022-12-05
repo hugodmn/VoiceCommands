@@ -6,6 +6,7 @@ import time
 import torch
 from CNN.inference import CNNInference
 from Fuzzywuzzy.comparaison import Commands 
+from TTS.pytts import VocalFeedback
 from queue import Queue
 from threading import Thread
 import whisper
@@ -17,7 +18,7 @@ model = whisper.load_model("tiny.en")
 LANGUAGE = "English"
 
 GOSAIcommands = Commands()
-
+VocalReturn = VocalFeedback()
 CHANNEL=1
 FORMAT=pyaudio.paFloat32
 #duration of wake up word audio 
@@ -122,6 +123,8 @@ def main()->None:
                         STTresult = result["text"]
                         print("transcription : ",STTresult)
                         GOSAIcommands.comparaison(STTresult)
+                        if GOSAIcommands.modeactiv != None :
+                            VocalFeedback.speak(GOSAIcommands.modeactiv)
                 # for i in range(int(1/SLIDING_WINDOW_SECS)*WUWSECONDS+1):
                 #         datarecup = q.get()
                 #         print("recup")
