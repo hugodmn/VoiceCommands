@@ -15,9 +15,9 @@ model = whisper.load_model("base.en")
 LANGUAGE = "English"
 CHANNEL=1
 FORMAT=pyaudio.paFloat32
-SECONDS=5
+SECONDS=4
 SAMPLE_RATE=44100
-SLIDING_WINDOW_SECS=1/3
+SLIDING_WINDOW_SECS=1/2
 RUN=True
 
 device = 'cpu'

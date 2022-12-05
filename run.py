@@ -99,7 +99,7 @@ def main()->None:
 
 
             if new_trigger== 0:
-                print("activate")
+                print("************** activate **************")
                 STTdata = librosa.resample(datarecup, orig_sr = 44100, target_sr=16000)
               
 

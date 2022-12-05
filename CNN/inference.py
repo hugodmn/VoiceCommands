@@ -55,9 +55,9 @@ class CNNInference:
 
         
         
-        print(x.size())
+        
         x= F.resample(x, 44100, 16000)
-        print(x.size())
+        
 
         # if x.shape[1] > 16000:
         #     x = x[:, :16000]
@@ -66,11 +66,10 @@ class CNNInference:
         #     last_dim_padding = (0, num_missing_samples)
         #     x = torch.nn.functional.pad(x, last_dim_padding)
         mel_spectro=self.mel_spectrogram(x)
-        print(mel_spectro.size())
+        
         mel_spectro = mel_spectro.unsqueeze(0)
     
-        print(mel_spectro)
-        print(mel_spectro.unsqueeze(0).size())
+       
         prediction =predict(self.model_cnn,mel_spectro.unsqueeze(0),self.class_mapping)
         return prediction
 
