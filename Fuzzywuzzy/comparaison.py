@@ -16,7 +16,7 @@ class Commands():
             t = time.time()
 
 
-            activation = fuzz.partial_token_set_ratio(transcription, "active")
+            activation = max(fuzz.partial_token_set_ratio(transcription, "active"),fuzz.partial_token_set_ratio(transcription, "achieve"))
   
             print("active prob : ", activation)
             if (activation > 80):
