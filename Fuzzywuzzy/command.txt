@@ -1,0 +1,2 @@
+"activation of the triangles"/mode=triangles 
+"activation of the sleep mode"/mode=sleepmode 
