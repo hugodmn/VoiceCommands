@@ -9,10 +9,10 @@ class VocalFeedback():
         with open("command.txt",'r') as f:
             lines = f.readlines()
             for line in lines :
-                self.commandsdic[line.split("/")[1]] = line.split("/")[2]
+                self.feedbacks[line.split("/")[1]] = line.split("/")[2]
 
     def speak(self, mode):
         engine = pyttsx3.init()
-        engine.say(self.commandsdic[mode])
+        engine.say(self.feedbacks[mode])
         engine.runAndWait()
         
