@@ -12,31 +12,39 @@ from threading import Thread
 import whisper
 import librosa
 
-
-#WHISPER:
+device = 'cpu'
+#WHISPER model settings:
 model = whisper.load_model("tiny.en")
 LANGUAGE = "English"
 
+#import GOSAI commands
 GOSAIcommands = Commands()
+#import Vocal feedbacks
 VocalReturn = VocalFeedback()
+modefeedback = []
+#import WUW inference
+WUWinf = CNNInference()
+
+#Stream settings
 CHANNEL=1
 FORMAT=pyaudio.paFloat32
-#duration of wake up word audio 
+SAMPLE_RATE=44100
+RUN=True
+#duration of wake up word audio (sec)
 WUWSECONDS=2
-#duration of speech to text audio
+#duration of speech to text audio (sec)
 STTSECONDS=4
 
-SAMPLE_RATE=44100
-SLIDING_WINDOW_SECS=1/6
-RUN=True
-WUWinf = CNNInference()
-device = 'cpu'
 
+SLIDING_WINDOW=1/6
 Numberofsttwindows = 3
-CHUNK = int(SLIDING_WINDOW_SECS*SAMPLE_RATE*WUWSECONDS)  #ici equivalent de 25ms
+CHUNK = int(SLIDING_WINDOW*SAMPLE_RATE*WUWSECONDS)  #equivalent to 20ms
 
 WUWfeed_samples=SAMPLE_RATE*WUWSECONDS   
 STTfeed_samples=SAMPLE_RATE*STTSECONDS
+
+
+
 
 def get_audio_input_stream(callback)->pyaudio.PyAudio:
     stream = pyaudio.PyAudio().open(
@@ -83,7 +91,7 @@ def main()->None:
     # Data buffer for the input wavform
    
     stream = get_audio_input_stream(callback)
-    #stream.start_stream()
+  
     try:
         while RUN:
             datarecup = q.get()
@@ -91,8 +99,6 @@ def main()->None:
 
             new_trigger = inference.get_prediction(torch.tensor(datarecup))
             if new_trigger==1:
-
-
 
                 print('not activated')
 
@@ -121,12 +127,16 @@ def main()->None:
                         STTdata = STTdata[-STTfeed_samples:]
                         result = model.transcribe(STTdata, language=LANGUAGE)
                         STTresult = result["text"]
+
                         print("transcription : ",STTresult)
                         GOSAIcommands.comparaison(STTresult)
                         print(GOSAIcommands.modeactive)
                         if GOSAIcommands.modeactive != None :
-                            VocalReturn.speak(GOSAIcommands.modeactive)
+                            modefeedback.append(GOSAIcommands.modeactive)
+                            
                             GOSAIcommands.modeactive = None
+                for k in modefeedback:
+                    VocalReturn.speak(k)
 
                 # for i in range(int(1/SLIDING_WINDOW_SECS)*WUWSECONDS+1):
                 #         datarecup = q.get()
