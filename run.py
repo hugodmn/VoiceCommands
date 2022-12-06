@@ -24,7 +24,7 @@ FORMAT=pyaudio.paFloat32
 #duration of wake up word audio 
 WUWSECONDS=2
 #duration of speech to text audio
-STTSECONDS=6
+STTSECONDS=4
 
 SAMPLE_RATE=44100
 SLIDING_WINDOW_SECS=1/6
