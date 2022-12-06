@@ -68,7 +68,7 @@ q = Queue()
 def callback(in_data:np.array, frame_count, time_info, flag)->Tuple[np.array,pyaudio.PyAudio]:
     global data, RUN, q
 
-    silence_threshold = 0.001
+    silence_threshold = 0.05
 
     # if time.time() > timeout:
     #     RUN = False        
