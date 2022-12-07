@@ -113,7 +113,7 @@ def main()->None:
                 #process to recuperation of 6 sec audio from the queue 
                 for j in range(Numberofsttwindows+1):
                  
-                    for i in range(int(1/SLIDING_WINDOW_SECS)):
+                    for i in range(int(1/SLIDING_WINDOW)):
                       
                         datarecup = q.get()                     
                        
