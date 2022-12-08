@@ -5,7 +5,7 @@ import time
 class Commands():
     def __init__(self):
         self.commandsdic = dict()
-        with open("Fuzzywuzzy/command.txt",'r') as f:
+        with open("command.txt",'r') as f:
             lines = f.readlines()
             for line in lines :
                 self.commandsdic[line.split("/")[0]] = line.split("/")[1]
