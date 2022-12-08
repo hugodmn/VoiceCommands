@@ -43,7 +43,7 @@ CHUNK = int(SLIDING_WINDOW*SAMPLE_RATE*WUWSECONDS)  #equivalent to 20ms
 WUWfeed_samples=SAMPLE_RATE*WUWSECONDS   
 STTfeed_samples=SAMPLE_RATE*STTSECONDS
 
-
+silence_threshold = 0.05
 
 
 def get_audio_input_stream(callback)->pyaudio.PyAudio:
@@ -95,48 +95,50 @@ def main()->None:
     try:
         while RUN:
             datarecup = q.get()
+            print("dB -> ",np.abs(datarecup).mean())
+            if np.abs(datarecup).mean()>silence_threshold:
            
+                new_trigger = inference.get_prediction(torch.tensor(datarecup))
+                
+                if new_trigger==1:
 
-            new_trigger = inference.get_prediction(torch.tensor(datarecup))
-            if new_trigger==1:
-
-                print('not activated')
-
-
+                    print('not activated')
 
 
-            if new_trigger== 0:
-                print("************** activate **************")
-                STTdata = librosa.resample(datarecup, orig_sr = 44100, target_sr=16000)
+
+
+                if new_trigger== 0:
+                    print("************** activate **************")
+                    STTdata = librosa.resample(datarecup, orig_sr = 44100, target_sr=16000)
               
 
                 #process to recuperation of 6 sec audio from the queue 
-                for j in range(Numberofsttwindows+1):
+                    for j in range(Numberofsttwindows+1):
                  
-                    for i in range(int(1/SLIDING_WINDOW)):
+                        for i in range(int(1/SLIDING_WINDOW)):
                       
-                        datarecup = q.get()                     
+                            datarecup = q.get()                     
                        
-                    datarecup = librosa.resample(datarecup, orig_sr = 44100, target_sr=16000)
-                    len(datarecup)
-                    STTdata = np.append(STTdata,datarecup)
+                        datarecup = librosa.resample(datarecup, orig_sr = 44100, target_sr=16000)
+                        len(datarecup)
+                        STTdata = np.append(STTdata,datarecup)
                 
 
-                    if len(STTdata)>=16000*STTSECONDS:
+                        if len(STTdata)>=16000*STTSECONDS:
                      
-                        STTdata = STTdata[-STTfeed_samples:]
-                        result = model.transcribe(STTdata, language=LANGUAGE)
-                        STTresult = result["text"]
+                            STTdata = STTdata[-STTfeed_samples:]
+                            result = model.transcribe(STTdata, language=LANGUAGE)
+                            STTresult = result["text"]
 
-                        print("transcription : ",STTresult)
-                        GOSAIcommands.comparaison(STTresult)
-                        print(GOSAIcommands.modeactive)
-                        if GOSAIcommands.modeactive != None :
-                            modefeedback.append(GOSAIcommands.modeactive)
+                            print("transcription : ",STTresult)
+                            GOSAIcommands.comparaison(STTresult)
+                            print(GOSAIcommands.modeactive)
+                            if GOSAIcommands.modeactive != None :
+                                modefeedback.append(GOSAIcommands.modeactive)
                             
-                            GOSAIcommands.modeactive = None
-                for k in modefeedback:
-                    VocalReturn.speak(k)
+                                GOSAIcommands.modeactive = None
+                    for k in modefeedback:
+                        VocalReturn.speak(k)
 
                 # for i in range(int(1/SLIDING_WINDOW_SECS)*WUWSECONDS+1):
                 #         datarecup = q.get()
