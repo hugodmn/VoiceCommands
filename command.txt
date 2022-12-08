@@ -1,2 +1,5 @@
 "triangles"/mode=triangles/triangles activated
 "sleep mode"/mode=sleepmode/sleep mode activated  
+"affine"/mode=affine/affine mode activated
+"balls"/mode=balls/mode balls activated
+"Marine is stupid"/mode=MarineBeta/Marine you are stupid
