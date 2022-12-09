@@ -12,9 +12,12 @@ from threading import Thread
 import whisper
 import librosa
 
+
+torch.cuda.empty_cache()
+
 device = 'cpu'
 #WHISPER model settings:
-model = whisper.load_model("tiny.en")
+model = whisper.load_model("base.en")
 LANGUAGE = "English"
 
 #import GOSAI commands
@@ -30,6 +33,7 @@ CHANNEL=1
 FORMAT=pyaudio.paFloat32
 SAMPLE_RATE=44100
 RUN=True
+STTRun = False
 #duration of wake up word audio (sec)
 WUWSECONDS=2
 #duration of speech to text audio (sec)
@@ -60,27 +64,41 @@ def get_audio_input_stream(callback)->pyaudio.PyAudio:
 
 data = np.zeros(WUWfeed_samples, dtype=np.float32) 
 
-q = Queue()
+wuwq = Queue()
+sttq = Queue()
 
+fulltranscription = []
 
 def callback(in_data:np.array, frame_count, time_info, flag)->Tuple[np.array,pyaudio.PyAudio]:
-    global data, RUN, wuwq
+    global data, RUN, wuwq, sttq, STTRun 
 
         
     data0 = np.frombuffer(in_data, dtype=np.float32)
     data = np.append(data,data0)  
     
-    if len(data) > WUWfeed_samples:
-        data = data[-WUWfeed_samples:]
-     
-        q.put(data)
-        print("queue : ",q.qsize())
+    if STTRun == True:
+        print("STT")
+        if len(data) > STTfeed_samples:
+            data = data[-STTfeed_samples:]
+            print("before queue : ",len(data))
+            sttq.put(data)
+            print("STTqueue : ",sttq.qsize())
+            data = data[-STTfeed_samples//2:]
+
+
+
+    else : 
+        if len(data) > WUWfeed_samples:
+            data = data[-WUWfeed_samples:]
+        
+            wuwq.put(data)
+            print("WUWqueue : ",wuwq.qsize())
 
     return (in_data, pyaudio.paContinue)
 
 
 def main()->None:
-    global RUN
+    global RUN, STTRun
     
     inference=CNNInference()
     
@@ -94,7 +112,7 @@ def main()->None:
   
     try:
         while RUN:
-            datarecup = q.get()
+            datarecup = wuwq.get()
             print("dB -> ",np.abs(datarecup).mean())
             if np.abs(datarecup).mean()>silence_threshold:
            
@@ -109,36 +127,44 @@ def main()->None:
 
                 if new_trigger== 0:
                     print("************** activate **************")
-                    STTdata = librosa.resample(datarecup, orig_sr = 44100, target_sr=16000)
-              
-
+                    STTRun = True
+                    
+                    nbtranscription = 0
+                    
+                    starttest = time.time()
                 #process to recuperation of 6 sec audio from the queue 
-                    for j in range(Numberofsttwindows+1):
+                    # for j in range(Numberofsttwindows+1):
                  
-                        for i in range(int(1/SLIDING_WINDOW)):
-                      
-                            datarecup = q.get()                     
-                       
-                        datarecup = librosa.resample(datarecup, orig_sr = 44100, target_sr=16000)
-                        len(datarecup)
-                        STTdata = np.append(STTdata,datarecup)
-                
-
-                        if len(STTdata)>=16000*STTSECONDS:
-                     
-                            STTdata = STTdata[-STTfeed_samples:]
-                            result = model.transcribe(STTdata, language=LANGUAGE)
-                            STTresult = result["text"]
-
-                            print("transcription : ",STTresult)
-                            GOSAIcommands.comparaison(STTresult)
-                            print(GOSAIcommands.modeactive)
-                            if GOSAIcommands.modeactive != None :
-                                modefeedback.append(GOSAIcommands.modeactive)
+                    #     for i in range(int(1/SLIDING_WINDOW)):
+                    while nbtranscription < 2 :
+                        if not sttq.empty():
                             
-                                GOSAIcommands.modeactive = None
+                            STTdatarecup = sttq.get() 
+                                              
+                        
+                            STTdatarecup = librosa.resample(STTdatarecup, orig_sr = 44100, target_sr=16000)
+                            
+                            
+
+                    
+                            if len(STTdatarecup) >= STTSECONDS*16000: 
+                                result = model.transcribe(STTdatarecup, language=LANGUAGE)
+                                STTresult = result["text"]
+                                fulltranscription.append(STTresult)
+
+                                print("transcription : ",STTresult)
+                                GOSAIcommands.comparaison(STTresult)
+                                print(GOSAIcommands.modeactive)
+                                if GOSAIcommands.modeactive != None :
+                                    modefeedback.append(GOSAIcommands.modeactive)
+                                    
+                                    GOSAIcommands.modeactive = None
+                                nbtranscription += 1
+                                
+                    STTRun = False
                     for k in modefeedback:
                         VocalReturn.speak(k)
+                    print("time : ",time.time()-starttest)
 
                 # for i in range(int(1/SLIDING_WINDOW_SECS)*WUWSECONDS+1):
                 #         datarecup = q.get()
