@@ -12,15 +12,19 @@ class Commands():
         self.modeactive = None 
 
     def comparaison(self, transcription : str):
+        
+        activefunc = False
         for command, activ in self.commandsdic.items():
             # t = time.time()
 
 
             activation = max(fuzz.partial_token_set_ratio(transcription, "active"),fuzz.partial_token_set_ratio(transcription, "achieve"))
   
-            print("active prob : ", activation)
+            # print("active prob : ", activation)
             if (activation > 80):
-                
+                if activefunc == False :
+                    print("active fonction recognized") 
+                    activefunc = True
                 
                 #sim = fuzz.token_set_ratio(transcription, command)
                 sim2 =     fuzz.partial_token_set_ratio(transcription, command)

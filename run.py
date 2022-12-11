@@ -76,7 +76,7 @@ def callback(in_data:np.array, frame_count, time_info, flag)->Tuple[np.array,pya
     data = np.append(data,data0)  
     
     if STTRun == True:
-        print("STT")
+        # print("STT")
         if len(data) > STTfeed_samples:
             data = data[-STTfeed_samples:]
             #print("before queue : ",len(data))
@@ -136,7 +136,7 @@ def main()->None:
 
                 if new_trigger== 0:
                     print("Wake Up Word triggered -> activated ")
-                    print(" ************ Speech To Text ************")
+                    print(" ************ Speech To Text ************\nListening ...")
                     STTRun = True
                     
                     nbtranscription = 0
@@ -148,7 +148,7 @@ def main()->None:
                     #     for i in range(int(1/SLIDING_WINDOW)):
                     fulltranscription = []
                     modefeedback = []
-                    
+
                     while nbtranscription < 1 :
                         if not sttq.empty():
                             
