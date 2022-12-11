@@ -24,7 +24,7 @@ LANGUAGE = "English"
 GOSAIcommands = Commands()
 #import Vocal feedbacks
 VocalReturn = VocalFeedback()
-modefeedback = []
+
 #import WUW inference
 WUWinf = CNNInference()
 
@@ -67,7 +67,6 @@ data = np.zeros(WUWfeed_samples, dtype=np.float32)
 wuwq = Queue()
 sttq = Queue()
 
-fulltranscription = []
 
 def callback(in_data:np.array, frame_count, time_info, flag)->Tuple[np.array,pyaudio.PyAudio]:
     global data, RUN, wuwq, sttq, STTRun 
@@ -80,9 +79,9 @@ def callback(in_data:np.array, frame_count, time_info, flag)->Tuple[np.array,pya
         print("STT")
         if len(data) > STTfeed_samples:
             data = data[-STTfeed_samples:]
-            print("before queue : ",len(data))
+            #print("before queue : ",len(data))
             sttq.put(data)
-            print("STTqueue : ",sttq.qsize())
+            #print("STTqueue : ",sttq.qsize())
             data = data[-STTfeed_samples//2:]
 
 
@@ -92,7 +91,7 @@ def callback(in_data:np.array, frame_count, time_info, flag)->Tuple[np.array,pya
             data = data[-WUWfeed_samples:]
         
             wuwq.put(data)
-            print("WUWqueue : ",wuwq.qsize())
+            #print("WUWqueue : ",wuwq.qsize())
 
     return (in_data, pyaudio.paContinue)
 
@@ -100,6 +99,8 @@ def callback(in_data:np.array, frame_count, time_info, flag)->Tuple[np.array,pya
 def main()->None:
     global RUN, STTRun
     
+    activity = False
+    print("Silence :") 
     inference=CNNInference()
     
     # Run the demo for a timeout seconds
@@ -113,20 +114,29 @@ def main()->None:
     try:
         while RUN:
             datarecup = wuwq.get()
-            print("dB -> ",np.abs(datarecup).mean())
+            noiseValue = np.abs(datarecup).mean()
+            if not activity and noiseValue > silence_threshold:
+                    print("Activity detected :") 
+                    activity = True
+            if activity and noiseValue < silence_threshold:
+                 print("Silence :") 
+                 activity = False
+            print("noise value ->",np.abs(datarecup).mean())
+            
             if np.abs(datarecup).mean()>silence_threshold:
-           
+                
                 new_trigger = inference.get_prediction(torch.tensor(datarecup))
                 
                 if new_trigger==1:
 
-                    print('not activated')
+                    print('Wake Up Word triggered -> not activated')
 
 
 
 
                 if new_trigger== 0:
-                    print("************** activate **************")
+                    print("Wake Up Word triggered -> activated ")
+                    print(" ************ Speech To Text ************")
                     STTRun = True
                     
                     nbtranscription = 0
@@ -136,7 +146,10 @@ def main()->None:
                     # for j in range(Numberofsttwindows+1):
                  
                     #     for i in range(int(1/SLIDING_WINDOW)):
-                    while nbtranscription < 2 :
+                    fulltranscription = []
+                    modefeedback = []
+                    
+                    while nbtranscription < 1 :
                         if not sttq.empty():
                             
                             STTdatarecup = sttq.get() 
@@ -164,7 +177,7 @@ def main()->None:
                     STTRun = False
                     for k in modefeedback:
                         VocalReturn.speak(k)
-                    print("time : ",time.time()-starttest)
+                    print("time STT: ",time.time()-starttest)
 
                 # for i in range(int(1/SLIDING_WINDOW_SECS)*WUWSECONDS+1):
                 #         datarecup = q.get()
@@ -176,7 +189,7 @@ def main()->None:
                 #             print(STTdata)
                 #      STTdata = STTdata[-STTfeed_samples:]
 
-
+       
     except (KeyboardInterrupt, SystemExit):
         stream.stop_stream()
         stream.close()
@@ -185,4 +198,6 @@ def main()->None:
     stream.stop_stream()
     stream.close()
 
-main()
+if __name__ == '__main__':
+    print("*** Starting ***")
+    main()

@@ -13,7 +13,7 @@ class Commands():
 
     def comparaison(self, transcription : str):
         for command, activ in self.commandsdic.items():
-            t = time.time()
+            # t = time.time()
 
 
             activation = max(fuzz.partial_token_set_ratio(transcription, "active"),fuzz.partial_token_set_ratio(transcription, "achieve"))
@@ -25,16 +25,17 @@ class Commands():
                 #sim = fuzz.token_set_ratio(transcription, command)
                 sim2 =     fuzz.partial_token_set_ratio(transcription, command)
                 #print("token set ratio : ",sim)
-                print("checking for ", activ)
-                print("mode prob : ", sim2)
+                
+                # print("checking for ", activ)
+                # print("mode prob : ", sim2)
 
                 if (sim2 > 85):
                     print("activation of : ", activ)
                     self.modeactive = activ 
 
-            end = time.time()
-            print("process time : ",end - t )
-            print("---------------------------------------------")
+            # end = time.time()
+            # print("process time : ",end - t )
+            # print("---------------------------------------------")
 
 
 
