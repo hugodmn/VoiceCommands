@@ -9,7 +9,7 @@ class Commands():
             lines = f.readlines()
             for line in lines :
                 self.commandsdic[line.split("/")[0]] = line.split("/")[1]
-        self.modeactive = None 
+        self.modeactive = [] 
 
     def comparaison(self, transcription : str):
         
@@ -18,10 +18,17 @@ class Commands():
             # t = time.time()
 
 
-            activation = max(fuzz.partial_token_set_ratio(transcription, "active"),fuzz.partial_token_set_ratio(transcription, "achieve"))
-  
+            start = fuzz.partial_token_set_ratio(transcription, "start")
+            print("start prob : ", start)
+            stop = fuzz.partial_token_set_ratio(transcription, "stop")
+            print("stop prob : ", stop)
             # print("active prob : ", activation)
-            if (activation > 80):
+            if (start > 80 or stop > 80):
+                if start > stop :
+                    trigger = "start"
+                else :
+                    trigger = "stop"
+
                 if activefunc == False :
                     print("active fonction recognized") 
                     activefunc = True
@@ -35,7 +42,7 @@ class Commands():
 
                 if (sim2 > 85):
                     print("activation of : ", activ)
-                    self.modeactive = activ 
+                    self.modeactive=[trigger,activ] 
 
             # end = time.time()
             # print("process time : ",end - t )

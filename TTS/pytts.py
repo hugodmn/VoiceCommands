@@ -11,8 +11,8 @@ class VocalFeedback():
             for line in lines :
                 self.feedbacks[line.split("/")[1]] = line.split("/")[2]
 
-    def speak(self, mode):
+    def speak(self, mode, trigger):
         engine = pyttsx3.init()
-        engine.say(self.feedbacks[mode])
+        engine.say(self.feedbacks[mode]+" "+trigger)
         engine.runAndWait()
         

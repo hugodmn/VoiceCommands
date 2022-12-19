@@ -47,7 +47,7 @@ CHUNK = int(SLIDING_WINDOW*SAMPLE_RATE*WUWSECONDS)  #equivalent to 20ms
 WUWfeed_samples=SAMPLE_RATE*WUWSECONDS   
 STTfeed_samples=SAMPLE_RATE*STTSECONDS
 
-silence_threshold = 0.05
+silence_threshold = 0.03
 
 
 def get_audio_input_stream(callback)->pyaudio.PyAudio:
@@ -57,7 +57,7 @@ def get_audio_input_stream(callback)->pyaudio.PyAudio:
         rate=SAMPLE_RATE,
         input=True,
         frames_per_buffer=CHUNK,
-        input_device_index=11,
+        input_device_index=6,
         stream_callback=callback)
     return stream
 
@@ -168,15 +168,25 @@ def main()->None:
                                 print("transcription : ",STTresult)
                                 GOSAIcommands.comparaison(STTresult)
                                 print(GOSAIcommands.modeactive)
-                                if GOSAIcommands.modeactive != None :
+                                if len(GOSAIcommands.modeactive) != 0 :
+                                    print("mode active : ",GOSAIcommands.modeactive)
                                     modefeedback.append(GOSAIcommands.modeactive)
                                     
-                                    GOSAIcommands.modeactive = None
+                                    GOSAIcommands.modeactive = []
                                 nbtranscription += 1
                                 
                     STTRun = False
-                    for k in modefeedback:
-                        VocalReturn.speak(k)
+                    print(modefeedback)
+                    if len(modefeedback) > 0:
+                        print(1)
+                        for k in modefeedback:
+                            print(k)
+                            if k[0]=='start':
+                                print(k[1])
+                                VocalReturn.speak(k[1],'started')
+                            if k[0]=='stop':
+                                print(k[1])
+                                VocalReturn.speak(k[1],'stopped')
                     print("time STT: ",time.time()-starttest)
 
                 # for i in range(int(1/SLIDING_WINDOW_SECS)*WUWSECONDS+1):
