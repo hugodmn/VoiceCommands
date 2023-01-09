@@ -50,8 +50,8 @@ class CNNetwork(nn.Module):
             nn.MaxPool2d(kernel_size=2)
         )
         self.flatten = nn.Flatten()
-        self.linear1 = nn.Linear(512,256)
-        self.linear2 = nn.Linear(256,1)
+        self.linear = nn.Linear(1600,1)
+        #self.linear2 = nn.Linear(256,1)
         self.output = nn.Sigmoid()
 
     def forward(self, input_data): 
@@ -63,12 +63,12 @@ class CNNetwork(nn.Module):
         #print(x.size())   
         x = self.conv3(x)         # after conv3 -> [3,64,5,3]              [3, 64, 5, 5]
         #print(x.size())   
-        x = self.conv4(x)       # after conv4 size -> [3,128,2,1]          [3, 128, 2, 2]
+        #x = self.conv4(x)       # after conv4 size -> [3,128,2,1]          [3, 128, 2, 2]
         #x = input_data.view(x.size(0), -1)
         x = self.flatten(x)    # after flatten size -> [3,256]             [3, 512]
         #print(x.size())   
-        logits = self.linear1(x)   # after linear size -> [3,1]
-        logits = self.linear2(logits)
+        logits = self.linear(x)   # after linear size -> [3,1]
+        #logits = self.linear2(logits)
         #print(logits.size())   
         predictions = self.output(logits)
         return predictions
