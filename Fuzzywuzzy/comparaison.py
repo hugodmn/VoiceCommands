@@ -5,7 +5,7 @@ import time
 class Commands():
     def __init__(self):
         self.commandsdic = dict()
-        with open("command.txt",'r') as f:
+        with open("VoiceCommands/command.txt",'r') as f:
             lines = f.readlines()
             for line in lines :
                 self.commandsdic[line.split("/")[0]] = line.split("/")[1]
@@ -19,7 +19,7 @@ class Commands():
 
 
             start = fuzz.partial_token_set_ratio(transcription, "start")
-            print("start prob : ", start)
+            #print("start prob : ", start)
             stop = fuzz.partial_token_set_ratio(transcription, "stop")
             print("stop prob : ", stop)
             # print("active prob : ", activation)
@@ -33,10 +33,10 @@ class Commands():
                     print("active fonction recognized") 
                     activefunc = True
                 
-                #sim = fuzz.token_set_ratio(transcription, command)
+                #sim2 = fuzz.token_set_ratio(transcription, command)
                 sim2 =     fuzz.partial_token_set_ratio(transcription, command)
                 #print("token set ratio : ",sim)
-                
+                print(command, " prob : ", sim2)
                 # print("checking for ", activ)
                 # print("mode prob : ", sim2)
 

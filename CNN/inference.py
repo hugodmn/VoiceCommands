@@ -4,7 +4,7 @@ import torchaudio.functional as F
 import time
 
 #from dataset import WakeWordDataset
-from CNN.model.model import CNNetwork
+from VoiceCommands.CNN.model.model import CNNetwork
 from typing import Tuple
 
 import torchaudio
@@ -14,12 +14,12 @@ def predict(model, input:torch.Tensor, class_mapping:Tuple[int])->int:
     model.eval()
     prob = model(input)
     prediction = int(prob>0.5)
-    return prediction
+    return prediction,prob
 
 class CNNInference:
-    def __init__(self,class_mapping:Tuple[int]=[0, 1]) -> None:
-        self.model_cnn = CNNetwork()
-        self.state_dict = torch.load("CNN/model/state_dict_model.pt",map_location=torch.device('cpu'))
+    def __init__(self,device, class_mapping:Tuple[int]=[0, 1]) -> None:
+        self.model_cnn = CNNetwork().to(device)
+        self.state_dict = torch.load("VoiceCommands/CNN/model/state_dict_model.pt",map_location=torch.device('cpu'))
         self.model_cnn.load_state_dict(self.state_dict)
         self.class_mapping=class_mapping
 
@@ -35,7 +35,7 @@ class CNNInference:
       onesided=True,
         n_mels=64,
         mel_scale="htk",
-        ) 
+        ) .to(device)
         self.audio_transform = T.MelSpectrogram(
        sample_rate=44100,
        n_fft=1024,
@@ -48,7 +48,7 @@ class CNNInference:
       onesided=True,
         n_mels=64,
         mel_scale="htk",
-        ) 
+        ).to(device)
     
 
     def get_prediction(self,x:torch.Tensor)->int:
@@ -70,8 +70,8 @@ class CNNInference:
         mel_spectro = mel_spectro.unsqueeze(0)
     
        
-        prediction =predict(self.model_cnn,mel_spectro.unsqueeze(0),self.class_mapping)
-        return prediction
+        prediction,prob =predict(self.model_cnn,mel_spectro.unsqueeze(0),self.class_mapping)
+        return prediction,prob
 
 
 

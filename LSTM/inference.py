@@ -37,8 +37,8 @@ def get_featurizer(sample_rate):
 def predict(model, input:torch.Tensor, class_mapping:Tuple[int])->int:
     model.eval()
     prob = model(input)
-    prediction = int(prob>0.5)
-    return prediction
+    prediction = int(prob>0.1)
+    return prediction,prob
 
 class LSTMInference:
     def __init__(self,device, class_mapping:Tuple[int]=[0, 1]) -> None:
@@ -71,7 +71,7 @@ class LSTMInference:
         #     x = torch.nn.functional.pad(x, last_dim_padding)
        
     
-        prediction =predict(self.model_lstm,mfcc.to("cuda"),self.class_mapping)
-        return prediction
+        prediction,prob =predict(self.model_lstm,mfcc.to("cuda"),self.class_mapping)
+        return prediction,prob
 
 

@@ -30,4 +30,6 @@ class LSTM(nn.Module):
         out, (hn, cn) = self.lstm(x, hidden)
 
         out = self.classifier(hn)
-        return out
+
+
+        return torch.sigmoid(out)
