@@ -21,6 +21,7 @@ To add a new command, add in the file :
 "Word(s) to trigger the mode"/mode=NameOfTheMode/VocalFeedback
 
 exemples : 
-"sleep mode"/mode=sleep mode/"sleep mode"
--> STT : you need to say "Ok Gosai, start the sleep mode" or "Ok Gosai, stop the sleep mode"
+
+"sleep mode"/mode=sleep mode/"sleep mode"\n
+-> STT : you need to say "Ok Gosai, start the sleep mode" or "Ok Gosai, stop the sleep mode"\n
 -> TTS : the feed back will be "sleep mode started" or "sleep mode stopped"
