@@ -15,6 +15,8 @@ Using pytts text-to-speech to give a feedback for the user.
 
 
 
+
+
 COMMAND.TXT : 
 
 
