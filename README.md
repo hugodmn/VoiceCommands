@@ -22,6 +22,8 @@ To add a new command, add in the file :
 
 exemples : 
 
-"sleep mode"/mode=sleep mode/"sleep mode"\n
--> STT : you need to say "Ok Gosai, start the sleep mode" or "Ok Gosai, stop the sleep mode"\n
+"sleep mode"/mode=sleep mode/"sleep mode"
+
+-> STT : you need to say "Ok Gosai, start the sleep mode" or "Ok Gosai, stop the sleep mode"
+
 -> TTS : the feed back will be "sleep mode started" or "sleep mode stopped"
