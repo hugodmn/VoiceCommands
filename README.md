@@ -16,8 +16,12 @@ Using pytts text-to-speech to give a feedback for the user.
 
 
 COMMAND.TXT : 
+
+
 File composed of all commands we want the system to recognize and trigger : 
+
 To add a new command, add in the file : 
+
 "Word(s) to trigger the mode"/mode=NameOfTheMode/VocalFeedback
 
 exemples : 
