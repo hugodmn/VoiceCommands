@@ -71,7 +71,7 @@ class LSTMInference:
         #     x = torch.nn.functional.pad(x, last_dim_padding)
        
     
-        prediction,prob =predict(self.model_lstm,mfcc.to("cuda"),self.class_mapping)
+        prediction,prob =predict(self.model_lstm,mfcc.to("cpu"),self.class_mapping)
         return prediction,prob
 
 
